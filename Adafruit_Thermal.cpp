@@ -298,19 +298,44 @@ void Adafruit_Thermal::underlineOff() {
 
 void Adafruit_Thermal::printBitmap(int w, int h, const uint8_t *bitmap) {
   if (w > 384) return; // maximum width of the printer
-  for (int rowStart=0; rowStart < h; rowStart += 256) {
-    int chunkHeight = ((h - rowStart) > 255) ? 255 : (h - rowStart);
-    delay(500); // Need these delays else bitmap doesn't always print. ???
-    writeBytes(18, 42);
-    writeBytes(chunkHeight, w/8);
-    delay(500);
-    for (int i=0; i<((w/8)*chunkHeight); i++) {
-      PRINTER_PRINT(pgm_read_byte(bitmap + (rowStart*(w/8)) + i));
+	
+	
+	// The software serial buffer can hold 64 bytes.
+  
+	for (int rowStart=0; rowStart < h; rowStart += 256) {  // we are going to print 256 lines at a time
+		// chunkHeigth is the heigth of the chunk going to be printed
+		// it will be 256 lines max
+		int chunkHeight = ((h - rowStart) > 255) ? 255 : (h - rowStart);
+		// Need these delays else bitmap doesn't always print. ???
+		delay(500); 
+		// talk to the printer: say we are going to print imagen with h & w
+		// page 18 from manual
+		writeBytes(18, 42);
+		// now we say our h & w (its anoying you have to put firs h then w)
+		// width is w/8 cause every byte represents 8 dots
+		writeBytes(chunkHeight, w/8);
+		
+		// 50 should be enough?
+		delay(500);
+
+		// for every dot in my chunk
+		// i is a pointer scrolling the image array.
+		for (int i=0; i< ( chunkHeight * (w/8)); i++) {
+			// start of the image array plus ...
+			// star of the chunk ready to print plus ...
+			// i'st byte in the array ...
+			// print
+			PRINTER_PRINT(pgm_read_byte(bitmap + (rowStart * (w/8)) + i));
+			delay(2);
     }
+	// no need either?
     delay(500);
   }
 }
 
+	
+	
+	
 void Adafruit_Thermal::printBitmap(int w, int h, Stream *stream) {
   if (w > 384) return; // maximum width of the printer
   for (int rowStart=0; rowStart < h; rowStart += 256) {
