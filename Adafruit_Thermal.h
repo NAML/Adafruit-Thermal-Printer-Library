@@ -76,6 +76,10 @@ class Adafruit_Thermal : public Print {
     void underlineOff();
     void strikeOn();
     void strikeOff();
+	
+	
+	
+	void setInternalCharacterSet(uint8_t code);
 
     void justify(char value);
     void feed(uint8_t x = 1);

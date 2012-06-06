@@ -243,6 +243,10 @@ void Adafruit_Thermal::boldOn(){
 void Adafruit_Thermal::boldOff(){
   unsetPrintMode(BOLD_MASK);
 }
+	
+void Adafruit_Thermal::setInternalCharacterSet(uint8_t code){
+	  writeBytes(27, 82, code);
+}	
 
 void Adafruit_Thermal::justify(char value){
   uint8_t pos = 0;
